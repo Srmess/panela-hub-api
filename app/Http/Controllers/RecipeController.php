@@ -62,11 +62,10 @@ class RecipeController extends Controller
         return RecipeResource::make($recipe);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Recipe $recipe)
     {
-        //
+        $recipe->delete();
+
+        return response()->noContent();
     }
 }
