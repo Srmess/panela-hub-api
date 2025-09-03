@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RecipeController extends Controller
 {
@@ -22,12 +24,21 @@ class RecipeController extends Controller
         return RecipeResource::make($recipe->load(['author', 'ingredients', 'instructions']));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreRecipeRequest $request)
     {
-        //
+        $recipePayload = $request->getValidatedPayload();
+
+        $recipe = DB::transaction(function () use ($recipePayload) {
+            $recipe = Recipe::query()->create(
+                $recipePayload['recipe']
+            );
+            $recipe->instructions()->createMany($recipePayload['instructions']);
+            $recipe->ingredients()->createMany($recipePayload['ingredients']);
+
+            return $recipe;
+        });
+
+        return RecipeResource::make($recipe);
     }
 
     /**
