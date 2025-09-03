@@ -8,10 +8,19 @@ use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Requests\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 
-class RecipeController extends Controller
+class RecipeController extends Controller implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('can:own, recipe', except: ['index', 'show', 'store']),
+        ];
+    }
+
     public function index()
     {
         $recipes = Recipe::query()->paginate();
