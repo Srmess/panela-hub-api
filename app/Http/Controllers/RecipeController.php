@@ -5,9 +5,9 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRecipeRequest;
+use App\Http\Requests\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RecipeController extends Controller
@@ -41,12 +41,25 @@ class RecipeController extends Controller
         return RecipeResource::make($recipe);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Recipe $recipe)
+    public function update(UpdateRecipeRequest $request, Recipe $recipe)
     {
-        //
+        $recipePayload = $request->getValidatedPayload();
+
+        $recipe = DB::transaction(function () use ($recipe, $recipePayload) {
+            $recipe->update(
+                $recipePayload['recipe']
+            );
+
+            $recipe->instructions()->delete();
+            $recipe->ingredients()->delete();
+
+            $recipe->instructions()->createMany($recipePayload['instructions']);
+            $recipe->ingredients()->createMany($recipePayload['ingredients']);
+
+            return $recipe;
+        });
+
+        return RecipeResource::make($recipe);
     }
 
     /**
