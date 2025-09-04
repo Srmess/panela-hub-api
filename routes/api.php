@@ -18,4 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/me', [UserController::class, 'destroy'])->name('me.destroy');
 
     Route::apiResource('recipes', RecipeController::class);
+
+    Route::put('recipes/{recipe}/like', [RecipeController::class, 'like'])->name('recipe.like');
+    Route::put('recipes/{recipe}/dislike', [RecipeController::class, 'dislike'])->name('recipe.dislike');
+    Route::put('recipes/{recipe}/remove-like', [RecipeController::class, 'removeLike'])->name('recipe.removeLike');
 });

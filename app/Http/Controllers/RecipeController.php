@@ -17,7 +17,7 @@ class RecipeController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware('can:own, recipe', except: ['index', 'show', 'store']),
+            new Middleware('can:own, recipe', except: ['index', 'show', 'store', 'like', 'dislike', 'removeLike']),
         ];
     }
 
@@ -76,5 +76,26 @@ class RecipeController extends Controller implements HasMiddleware
         $recipe->delete();
 
         return response()->noContent();
+    }
+
+    public function like(Recipe $recipe)
+    {
+        $recipe->likes()->syncWithoutDetaching([auth()->id() => ['type' => 'like']]);
+
+        return response()->json(['liked' => true]);
+    }
+
+    public function dislike(Recipe $recipe)
+    {
+        $recipe->likes()->syncWithoutDetaching([auth()->id() => ['type' => 'dislike']]);
+
+        return response()->json(['disliked' => true]);
+    }
+
+    public function removeLike(Recipe $recipe)
+    {
+        $recipe->likes()->detach([auth()->id()]);
+
+        return response()->json(['like_removed' => true]);
     }
 }

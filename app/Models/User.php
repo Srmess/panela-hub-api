@@ -6,6 +6,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -55,5 +56,15 @@ class User extends Authenticatable
     public function recipes(): HasMany
     {
         return $this->hasMany(Recipe::class);
+    }
+
+    public function likedRecipes(): BelongsToMany
+    {
+        return $this->belongsToMany(Recipe::class, 'recipe_user_rates', 'user_id', 'recipe_id');
+    }
+
+    public function dislikedRecipes(): BelongsToMany
+    {
+        return $this->belongsToMany(Recipe::class, 'recipe_user_rates', 'user_id', 'recipe_id');
     }
 }
