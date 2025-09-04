@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RecipeController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -13,9 +13,9 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/me', function (Request $request) {
-        return response()->json($request->user());
-    });
+    Route::get('/me', [UserController::class, 'show'])->name('me.show');
+    Route::put('/me', [UserController::class, 'update'])->name('me.update');
+    Route::delete('/me', [UserController::class, 'destroy'])->name('me.destroy');
 
     Route::apiResource('recipes', RecipeController::class);
 });
