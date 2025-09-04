@@ -17,7 +17,14 @@ class RecipeController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware('can:own, recipe', except: ['index', 'show', 'store', 'like', 'dislike', 'removeLike']),
+            new Middleware(
+                'can:own,recipe',
+                only: ['update', 'destroy']
+            ),
+            new Middleware(
+                'can:notOwn,recipe',
+                only: ['like', 'dislike', 'removeLike']
+            ),
         ];
     }
 
