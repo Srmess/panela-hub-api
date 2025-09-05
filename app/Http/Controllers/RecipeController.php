@@ -8,6 +8,7 @@ use App\Http\Requests\StoreRecipeRequest;
 use App\Http\Requests\UpdateRecipeRequest;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
+use App\Models\RecipeView;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
@@ -30,14 +31,22 @@ class RecipeController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $recipes = Recipe::query()->paginate();
+        $recipes = Recipe::query()->withCount(['views', 'likes'])->orderBy('views_count', 'desc')->paginate();
+
+        return ($recipes);
 
         return RecipeResource::collection($recipes);
     }
 
     public function show(Recipe $recipe)
     {
-        return RecipeResource::make($recipe->load(['author', 'ingredients', 'instructions']));
+        if (auth()->id() !== $recipe->user_id) {
+            RecipeView::query()->create([
+                'recipe_id' => $recipe->id,
+            ]);
+        }
+
+        return RecipeResource::make($recipe->loadCount(['views', 'likes'])->load(['author', 'ingredients', 'instructions', 'views']));
     }
 
     public function store(StoreRecipeRequest $request)

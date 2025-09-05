@@ -27,6 +27,8 @@ class RecipeResource extends JsonResource
             'author'       => UserResource::make($this->whenLoaded('author')),
             'ingredients'  => IngredientResource::collection($this->whenLoaded('ingredients')),
             'instructions' => InstructionResource::collection($this->whenLoaded('instructions')),
+            'views_count'  => $this->views_count ?? null,
+            'likes_count'  => $this->likes_count ?? null,
         ];
     }
 }

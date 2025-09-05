@@ -30,6 +30,11 @@ class Recipe extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+    public function views(): HasMany
+    {
+        return $this->hasMany(RecipeView::class);
+    }
+
     public function likes(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'recipe_user_rates', 'recipe_id', 'user_id');
